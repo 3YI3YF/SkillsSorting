@@ -166,6 +166,11 @@ input.bad{border-color:#ff8a70;animation:shake .35s}@keyframes shake{25%{transfo
 .checks div{background:var(--paper);color:#24331d;border-radius:12px;padding:10px 6px;text-align:center;font-size:13.5px;font-weight:700}
 .checks i{display:block;font-style:normal;font-size:20px}.checks .no{opacity:.55}
 @media (max-width:640px){.buckets,.cols{grid-template-columns:1fr}.checks{grid-template-columns:repeat(2,1fr)}}
+
+/* CU dropdown */
+select{font:inherit;font-size:16px;width:100%;max-width:420px;display:block;margin:0 auto;padding:12px 16px;border-radius:12px;border:1.5px solid var(--line);background:rgba(0,0,0,.3);color:var(--ink);text-align:center;text-align-last:center}
+select option{background:#1f2b1a;color:#f4ecd8}
+select.bad{border-color:#ff8a70;animation:shake .35s}
 </style></head>
 <body>
 <div id="fireflies" aria-hidden="true"></div>
@@ -176,7 +181,22 @@ input.bad{border-color:#ff8a70;animation:shake .35s}@keyframes shake{25%{transfo
 <div class="how"><div><b>Technical</b>Systems, tools and how they run.</div><div><b>Data</b>Records, reports and how information is kept.</div><div><b>Process</b>Steps, workflows and how work moves.</div></div>
 <div class="how" style="grid-template-columns:1fr"><div><b>People &amp; Leadership</b>Guiding and supporting people through change.</div></div>
 <p style="text-align:center;font-size:14.5px;color:var(--muted)">12 cards · about 3 minutes · one card at a time</p>
-    <div class="namebox"><label for="pname">Your name (required)</label><input id="pname" maxlength="50" placeholder="e.g. Juan Dela Cruz" autocomplete="name" required aria-required="true"><div class="err" id="nerr" role="alert"></div></div>
+    <div class="namebox"><label for="pname">Your name (required)</label><input id="pname" maxlength="50" placeholder="e.g. Juan Dela Cruz" autocomplete="name" required aria-required="true">
+      <label for="pcu" style="margin-top:14px">Your Constituent Unit (CU) (required)</label>
+      <select id="pcu" required aria-required="true">
+        <option value="">Select your CU</option>
+        <option value="🌲 UP Baguio">🌲 UP Baguio</option>
+        <option value="⚔️ UP Cebu">⚔️ UP Cebu</option>
+        <option value="🌻 UP Diliman">🌻 UP Diliman</option>
+        <option value="⛰️ UP Los Baños">⛰️ UP Los Baños</option>
+        <option value="🏛️ UP Manila">🏛️ UP Manila</option>
+        <option value="🪶 UP Mindanao">🪶 UP Mindanao</option>
+        <option value="💻 UP Open University">💻 UP Open University</option>
+        <option value="💉 UP Philippine General Hospital">💉 UP Philippine General Hospital</option>
+        <option value="🌊 UP Tacloban">🌊 UP Tacloban</option>
+        <option value="🐟 UP Visayas">🐟 UP Visayas</option>
+      </select>
+      <div class="err" id="nerr" role="alert"></div></div>
     <button class="btn" id="begin">Begin</button>
   </section>
   <section id="play" class="panel hide"><div class="qhead"><span id="qnum">Card 1 of 12</span><span class="dots" id="dots"></span></div>
@@ -200,8 +220,10 @@ const $ = id => document.getElementById(id);
 
 function getName(){ const v=$('pname').value.trim().replace(/\s+/g,' ');
   if(v.length<2){ $('nerr').textContent='Please enter your name to start.'; $('pname').classList.remove('bad'); void $('pname').offsetWidth; $('pname').classList.add('bad'); $('pname').focus(); return null; }
+  if(!$('pcu').value){ $('nerr').textContent='Please choose your CU to start.'; $('pcu').classList.remove('bad'); void $('pcu').offsetWidth; $('pcu').classList.add('bad'); $('pcu').focus(); return null; }
   $('nerr').textContent=''; return v; }
 $('pname').addEventListener('input',()=>{ $('nerr').textContent=''; $('pname').classList.remove('bad'); });
+$('pcu').addEventListener('change',()=>{ $('nerr').textContent=''; $('pcu').classList.remove('bad'); });
 $('pname').addEventListener('keydown',e=>{ if(e.key==='Enter') $('begin').click(); });
 async function saveCard(file,label){ const btn=$('save'); btn.disabled=true; btn.textContent='Saving\u2026';
   try{ if(!window.html2canvas) throw 0; const c=await html2canvas($('card'),{backgroundColor:'#1f2b1a',scale:2,useCORS:true});
@@ -225,7 +247,7 @@ const CARDS=[
  {s:'Facilitation',d:'Leading a meeting so everyone is heard.',g:'ppl',tip:'Bringing people together is People & Leadership.'}
 ];
 const gname=id=>GROUPS.find(g=>g.id===id).name;
-let order=[], i=0, res=[], name='';
+let order=[], i=0, res=[], name='', cu='';
 function shuffle(a){a=a.slice();for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;}
 function dots(){ $('dots').innerHTML=order.map((_,k)=>`<i class="${k<res.length?(res[k].ok?'ok':'no'):(k===i?'now':'')}"></i>`).join(''); }
 function show(){ const C=order[i]; $('qnum').textContent=`Card ${i+1} of ${order.length}`;
@@ -238,10 +260,10 @@ $('buckets').addEventListener('click',e=>{ const b=e.target.closest('.bucket'); 
   $('fb').className='fb show '+(ok?'good':'miss'); $('fb').innerHTML=ok?`<h3 class="gold">Nice sort!</h3><p>${C.tip}</p>`:`<h3 style="color:var(--gold2)">Not quite. It goes under ${gname(C.g)}.</h3><p>${C.tip}</p>`;
   $('next').textContent=i===order.length-1?'See my skill map':'Next card'; $('next').classList.remove('hide'); dots(); });
 $('next').onclick=()=>{ i++; i<order.length?show():finish(); };
-$('begin').onclick=()=>{ const n=getName(); if(!n) return; name=n; audio(); if(musicPref!=='0') setMusic(true);
+$('begin').onclick=()=>{ const n=getName(); if(!n) return; name=n; cu=$('pcu').value; audio(); if(musicPref!=='0') setMusic(true);
   $('intro').classList.add('hide'); $('play').classList.remove('hide'); $('subline').textContent=`Good luck, ${name}!`; order=shuffle(CARDS); i=0; res=[]; show(); };
 function finish(){ $('play').classList.add('hide'); $('end').classList.remove('hide'); $('pageTop').classList.add('hide');
-  const sc=res.filter(r=>r.ok).length; $('who').textContent=name; $('endScore').textContent=`${sc}/12`;
+  const sc=res.filter(r=>r.ok).length; $('who').textContent=`${name} · ${cu}`; $('endScore').textContent=`${sc}/12`;
   $('cols').innerHTML=GROUPS.map(g=>`<div class="colbox"><h4>${g.name}</h4>${res.filter(r=>r.c.g===g.id).map(r=>`<div class="${r.ok?'':'x'}">${r.ok?'✓':'✗'} ${r.c.s}${r.ok?'':` <small>(you picked ${gname(r.pick)})</small>`}</div>`).join('')}</div>`).join('');
   $('quote').textContent= sc>=11?'You know your skill map. Bring it to Game 3!': sc>=8?'Almost there. You know most of your skill map.':'Every skill map starts somewhere. Keep exploring!';
   fanfare(); if(sc===12) starShower(); window.scrollTo({top:0,behavior:'smooth'}); }
