@@ -97,7 +97,7 @@ h1{font:italic 700 clamp(34px,4vw,50px)/1.1 var(--serif);margin:8px 0 10px;color
     <aside class="pane" aria-label="Game controls">
       <div class="timer-bar">
         <div class="timer" id="timer" role="timer" aria-label="Time remaining"><small>Time remaining</small><div class="clock" id="clock">04:00</div></div>
-        <div class="player"><small>Player</small><div id="pcap">Enter your name and CU to begin.</div></div>
+        <div class="player"><small>Player</small><div id="pcap">Enter your name and UP CU to begin.</div></div>
       </div>
 
       <section class="card" id="start">
@@ -105,9 +105,10 @@ h1{font:italic 700 clamp(34px,4vw,50px)/1.1 var(--serif);margin:8px 0 10px;color
         <h2>Ready to sort?</h2>
         <p>You will sort 12 skills into 4 groups. Your <strong>4-minute timer</strong> starts when you press <strong>Ready</strong>.</p>
         <div class="field"><label for="pname">Player name</label><input id="pname" type="text" maxlength="80" autocomplete="name" placeholder="Enter your full name"></div>
-        <div class="field"><label for="pcu">Constituent unit (CU) of the UP System</label>
+        <div class="field"><label for="pcu">UP Constituent University (UP CU)</label>
           <select id="pcu">
-            <option value="">Select your CU</option>
+            <option value="">Select your UP CU</option>
+            <option value="🎓 UP System">🎓 UP System</option>
             <option value="🌲 UP Baguio">🌲 UP Baguio</option>
             <option value="⚔️ UP Cebu">⚔️ UP Cebu</option>
             <option value="🌻 UP Diliman">🌻 UP Diliman</option>
@@ -121,7 +122,7 @@ h1{font:italic 700 clamp(34px,4vw,50px)/1.1 var(--serif);margin:8px 0 10px;color
           </select>
         </div>
         <button class="btn full" id="ready" type="button" disabled>I’m Ready — Start the timer →</button>
-        <p class="note">Your name and CU stay in your browser. They only appear on the PNG you save.</p>
+        <p class="note">Your name and UP CU stay in your browser. They only appear on the PNG you save.</p>
       </section>
 
       <section class="card" id="play" hidden>
@@ -253,7 +254,7 @@ async function finish(timedOut) {
 }
 function reset() {
   clearInterval(ticker); ticker = null; started = false; finished = false; remaining = MAX; answers = []; idx = 0; pngURL = '';
-  $('pcap').textContent = 'Enter your name and CU to begin.';
+  $('pcap').textContent = 'Enter your name and UP CU to begin.';
   $('start').hidden = false; $('play').hidden = true; $('done').hidden = true;
   updateProgress(); tick(); validate();
 }
