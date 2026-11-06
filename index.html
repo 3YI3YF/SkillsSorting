@@ -70,16 +70,28 @@ h1{font:italic 700 clamp(34px,4vw,50px)/1.1 var(--serif);margin:8px 0 10px;color
 .foot{text-align:center;margin-top:30px}
 .foot .t{font:500 clamp(20px,3vw,30px)/1.2 var(--serif);color:var(--gold);margin:0 0 8px}
 .foot .o{font-size:11px;color:#7c8c76}
+
+/* ===== Game 3 background: binary-pattern night garden + botanical corners ===== */
+body{background:radial-gradient(circle at 50% 0%,rgba(233,196,106,.10),transparent 40%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg fill='%23d9b45a' fill-opacity='.075' font-family='monospace' font-size='15'%3E%3Ctext x='8' y='24'%3E0 1 0 0 1 0%3C/text%3E%3Ctext x='96' y='70'%3E1 0 1 1 0%3C/text%3E%3Ctext x='20' y='118'%3E0 0 1 0 1 1%3C/text%3E%3Ctext x='130' y='160'%3E1 1 0 1 0%3C/text%3E%3Ctext x='40' y='206'%3E0 1 0 1 0 0%3C/text%3E%3Ctext x='150' y='246'%3E0 1 1 0%3C/text%3E%3C/g%3E%3C/svg%3E"),linear-gradient(180deg,#17291c 0%,#1b3022 55%,#12211a 100%);background-attachment:fixed}
+.shell{position:relative;z-index:1}
+#botanicals{position:fixed;inset:0;pointer-events:none;z-index:0}
+.corner{position:fixed;width:clamp(170px,22vw,360px);height:auto;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}
+.corner.tl{left:0;top:0}.corner.tr{right:0;top:0}.corner.bl{left:0;bottom:0}.corner.br{right:0;bottom:0}
+.pane{background:rgba(12,26,17,.78);backdrop-filter:blur(6px)}
+.tags{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.music{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--gold2);border-radius:999px;padding:9px 16px;font-size:12px;font-weight:700}
+.music:hover{background:rgba(233,196,106,.16)}
 @media(max-width:950px){.columns{grid-template-columns:1fr}}
 @media(max-width:600px){.shell{padding:12px}.pane{padding:16px;border-radius:19px}.picks,.bins{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
+<div id="botanicals" aria-hidden="true"></div>
 <main class="shell">
   <header class="brandbar">
     <div class="brand">Three Years In, Three Years Forward</div>
-    <span class="tag">GAME 01 &nbsp;•&nbsp; SKILL SORTING</span>
+    <div class="tags"><button type="button" class="music" id="music" aria-pressed="true">🎵 Music on</button><span class="tag">GAME 01 &nbsp;•&nbsp; SKILL SORTING</span></div>
   </header>
   <div class="columns">
     <section class="pane story" aria-label="Skill groups">
@@ -341,6 +353,129 @@ $('ready').addEventListener('click', start);
 $('next').addEventListener('click', next);
 $('save').addEventListener('click', save);
 $('again').addEventListener('click', reset);
+
+// ===== Botanical set (same art as Game 3): orchid, hydrangea, lotus, protea, plumeria, calla, dill, gold-line leaves =====
+const FLOWER_DEFS = (() => {
+  const S = (n, f) => Array.from({ length: n }, (_, i) => f(i)).join('');
+  const veins = S(6, i => { const y = -16 - i * 13; return `M0 ${y}L${-15 + i} ${y - 13}M0 ${y}L${15 - i} ${y - 13}`; });
+  const leafD = 'M0 0C-28-30-24-75 0-100C24-75 28-30 0 0Z';
+  const frond = S(17, i => {
+    const t = (i + 1) / 19, x = 36 * (1 - t) * t, y = -180 * (1 - t) * t - 200 * t * t, l = 46 * (1 - t * .65);
+    return `M${x} ${y}l${l} ${-l * .75}M${x} ${y}l${-l} ${-l * .75}`;
+  });
+  const pet = fill => `fill="${fill}" stroke="#d8d1b8" stroke-width=".8"`;
+  return `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <linearGradient id="gLeaf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f8a5b"/><stop offset="1" stop-color="#0f4a32"/></linearGradient>
+    <linearGradient id="gPet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e9e3cb"/></linearGradient>
+    <linearGradient id="gPeach" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0e6"/><stop offset="1" stop-color="#f7b9a0"/></linearGradient>
+    <radialGradient id="gLotus" cx=".5" cy="1" r="1"><stop offset="0" stop-color="#e6d6fa"/><stop offset="1" stop-color="#a98be0"/></radialGradient>
+    <g id="lf"><path d="${leafD}" fill="url(#gLeaf)" stroke="#d9b45a" stroke-width=".9"/><path d="M0 0V-96${veins}" stroke="#d9b45a" stroke-width=".6" fill="none"/></g>
+    <g id="lg"><path d="${leafD}" fill="rgba(20,60,40,.25)" stroke="#c9a24e" stroke-width="1"/><path d="M0 0V-96${veins}" stroke="#c9a24e" stroke-width=".7" fill="none"/></g>
+    <g id="fr"><path d="M0 0Q18-90 0-200" stroke="#3a7a52" stroke-width="3" fill="none"/><path d="${frond}" stroke="#2f7a50" stroke-width="3.2" stroke-linecap="round" fill="none"/><path d="${frond}" stroke="#c9a24e" stroke-width=".8" stroke-linecap="round" fill="none" opacity=".8"/></g>
+    <g id="bl">${S(5, i => `<path transform="rotate(${i * 72})" d="M0 0C-17-10-17-35 0-37C17-35 17-10 0 0Z" ${pet('url(#gPet)')}/>`)}<circle r="5" fill="#e9b949"/></g>
+    <g id="pk">${S(5, i => `<path transform="rotate(${i * 72})" d="M0 0C-18-8-18-34 0-36C18-34 18-8 0 0Z" fill="url(#gPeach)" stroke="#f0b49c" stroke-width=".8"/>`)}<circle r="5" fill="#f4a93c"/>${S(8, i => `<circle cx="${Math.cos(i) * 9}" cy="${Math.sin(i) * 9}" r="1.2" fill="#d9822b"/>`)}</g>
+    <g id="pl">${S(5, i => `<g transform="rotate(${i * 72})"><path d="M0 0C-9-14-4-42 15-46C32-32 23-8 0 0Z" ${pet('url(#gPet)')}/><path d="M0 0C-3-10 2-26 9-30C14-18 9-6 0 0Z" fill="#f8d79a" opacity=".85"/></g>`)}<circle r="4" fill="#f2b33c"/></g>
+    <g id="pro">${S(14, i => `<path transform="rotate(${i * 25.7})" d="M0-8L-7-36L0-46L7-36Z" fill="#e8b94f" stroke="#a87419" stroke-width=".6"/>`)}${S(12, i => `<path transform="rotate(${i * 30 + 15})" d="M0-6L-5-26L0-33L5-26Z" fill="#f3d27c" stroke="#b98622" stroke-width=".5"/>`)}<circle r="12" fill="#f6e7b9" stroke="#c9a24e" stroke-width=".8"/></g>
+    <g id="cf"><path d="M0 20C-34 8-42-34-20-60C-12-34 8-30 14-22C26-40 40-42 44-34C48-4 28 18 0 20Z" fill="url(#gPet)" stroke="#cfc9b0" stroke-width="1"/><path d="M3 8Q2-12 8-34" stroke="#e9b949" stroke-width="6.5" fill="none" stroke-linecap="round"/></g>
+    <g id="ca"><path d="M0 22C3 80-4 130 2 200" stroke="#2f7b52" stroke-width="4.5" fill="none" stroke-linecap="round"/><use href="#cf"/></g>
+    <g id="or"><ellipse cx="0" cy="-26" rx="15" ry="23" ${pet('url(#gPet)')}/><ellipse cx="-27" cy="-6" rx="26" ry="20" transform="rotate(-18 -27 -6)" ${pet('url(#gPet)')}/><ellipse cx="27" cy="-6" rx="26" ry="20" transform="rotate(18 27 -6)" ${pet('url(#gPet)')}/><ellipse cx="-16" cy="20" rx="13" ry="21" transform="rotate(28 -16 20)" ${pet('url(#gPet)')}/><ellipse cx="16" cy="20" rx="13" ry="21" transform="rotate(-28 16 20)" ${pet('url(#gPet)')}/><path d="M-7 4C-4-6 4-6 7 4C6 14 0 18 0 18C0 18-6 14-7 4Z" fill="#f2b8c8" stroke="#d98aa4" stroke-width=".6"/><circle cy="-2" r="3.4" fill="#f2b33c"/></g>
+    <g id="hy">${S(16, i => { const a = i * 2.4, r = 6.2 * Math.sqrt(i); return `<circle cx="${Math.cos(a) * r}" cy="${Math.sin(a) * r}" r="12" fill="#fff" stroke="#d9d3bb" stroke-width=".8"/><circle cx="${Math.cos(a) * r}" cy="${Math.sin(a) * r}" r="2" fill="#f1e6b8"/>`; })}</g>
+    <g id="lo">${S(7, i => `<path transform="rotate(${-72 + i * 24})" d="M0 0C-13-14-11-38 0-52C11-38 13-14 0 0Z" fill="url(#gLotus)" fill-opacity=".8" stroke="#efe6ff" stroke-width=".9"/>`)}<circle cy="-6" r="4" fill="#f2c96b"/></g>
+    <g id="um"><path d="M0 0V60" stroke="#cdbf8a" stroke-width="1.2"/>${S(11, i => { const a = (-80 + i * 16) * Math.PI / 180; const x = Math.sin(a) * 28, y = -Math.cos(a) * 28; return `<path d="M0 0L${x} ${y}" stroke="#cdbf8a" stroke-width=".8"/><circle cx="${x}" cy="${y}" r="2" fill="#e5d9a4"/>`; })}</g>
+    <g id="sp"><circle r="2.2" fill="#f2c96b"/></g>
+  </defs></svg>`;
+})();
+
+function cornerArt() {
+  const u = (id, x, y, s = 1, r = 0) => `<use href="#${id}" transform="translate(${x} ${y}) rotate(${r}) scale(${s})"/>`;
+  const sparks = pts => pts.map(([x, y, s]) => u('sp', x, y, s)).join('');
+  const branch = '<path d="M10 70C60 60 110 40 170 30" stroke="#c9a24e" stroke-width="1" fill="none"/>';
+  return {
+    tl: u('fr', -10, -10, 1.2, 135) + u('lg', 0, 170, 1.7, 148) + u('lg', 40, 0, 1.4, 118) + branch
+      + u('bl', 40, 62, .5, 10) + u('bl', 90, 48, .42, 30) + u('bl', 135, 32, .5, 0) + u('bl', 62, 95, .4, 50) + u('bl', 28, 20, .42, 20)
+      + u('or', 70, 165, .85, -22) + u('hy', 140, 120, .55) + sparks([[210, 70, 1], [150, 190, 1.2], [240, 150, .8]]),
+    tr: u('fr', 410, -10, 1.2, -135) + u('fr', 410, 30, .95, -108) + u('lg', 360, 0, 1.4, -120)
+      + u('pl', 340, 50, 1.45, 15) + u('pl', 285, 22, .95, 40) + u('pl', 378, 120, 1.05, -20) + u('pk', 250, 80, .5)
+      + sparks([[215, 40, 1], [255, 160, 1.2], [185, 105, .8]]),
+    bl: u('lf', 0, 420, 1.5, 24) + u('lf', 22, 420, 1.25, 52) + u('lg', 0, 390, 1.5, 78)
+      + u('hy', 62, 300, 1.05) + u('hy', 36, 238, .85) + u('hy', 104, 250, .7) + u('pro', 150, 366, 1.3, 5)
+      + u('lo', 230, 390, 1.1, 0) + u('pk', 185, 300, .55) + u('pk', 20, 340, .6)
+      + sparks([[240, 320, 1.2], [140, 220, 1], [290, 392, .9]]),
+    br: u('lf', 400, 420, 1.5, -24) + u('lf', 378, 420, 1.25, -52) + u('lg', 400, 390, 1.5, -78)
+      + u('ca', 322, 225, 1.05, -8) + u('ca', 372, 270, .95, 12) + u('ca', 265, 300, .75, -18)
+      + u('um', 215, 345, .9) + u('um', 190, 372, .65) + u('pk', 232, 392, .75) + u('bl', 200, 300, .45) + u('hy', 285, 385, .45)
+      + sparks([[185, 290, 1], [255, 205, 1.2], [155, 385, .9]])
+  };
+}
+function buildBotanicals() {
+  $('botanicals').innerHTML = FLOWER_DEFS + Object.entries(cornerArt()).map(([k, v]) => `<svg class="corner ${k}" viewBox="0 0 400 400" aria-hidden="true">${v}</svg>`).join('');
+}
+
+// ===== Background music: generative loop (Cmaj7 - Am7 - Fmaj7 - G6, 82 BPM), same as Game 3 =====
+const Music = (() => {
+  let ctx = null, master = null, bus = null, on = true, run = false, timer = null, next = 0, step = 0;
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12), EIGHTH = 60 / 82 / 2;
+  const CHORDS = [[48, 60, 64, 67, 71], [45, 57, 60, 64, 67], [41, 53, 57, 60, 64], [43, 55, 59, 62, 64]];
+  const PENTA = [72, 74, 76, 79, 81, 84], ARP = [0, 2, 1, 3, 2, 1, 3, 2];
+  const ensure = () => {
+    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = .85; master.connect(ctx.destination); } catch (e) { return false; } }
+    if (ctx.state === 'suspended') ctx.resume();
+    return true;
+  };
+  const ensureBus = () => {
+    if (bus) return;
+    bus = ctx.createGain(); bus.gain.value = .0001;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3000;
+    const dly = ctx.createDelay(1); dly.delayTime.value = EIGHTH * 3;
+    const fb = ctx.createGain(); fb.gain.value = .34;
+    const wet = ctx.createGain(); wet.gain.value = .38;
+    bus.connect(lp); lp.connect(master); lp.connect(dly); dly.connect(fb); fb.connect(dly); dly.connect(wet); wet.connect(master);
+  };
+  const note = (m, d, vol, delay, type = 'triangle', attack = .012) => {
+    const t = ctx.currentTime + delay, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(mtof(m), t);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + attack); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(bus); o.start(t); o.stop(t + d + .05);
+  };
+  const schedule = (n, t0) => {
+    const delay = Math.max(0, t0 - ctx.currentTime), s = n % 8, ch = CHORDS[Math.floor(n / 8) % 4], tones = ch.slice(1);
+    if (s === 0) { ch.slice(1, 4).forEach(m => note(m, EIGHTH * 8.5, .05, delay, 'sine', .7)); note(ch[0], 1.1, .17, delay, 'sine', .02); }
+    if (s === 4) note(ch[0], .8, .1, delay, 'sine', .02);
+    note(tones[ARP[s]] + 12, .6, .055, delay);
+    const odds = { 0: .75, 3: .4, 6: .5 }[s];
+    if (odds && Math.random() < odds) { const m = PENTA[Math.floor(Math.random() * PENTA.length)]; note(m, 1.3, .075, delay, 'sine'); note(m + 12, .5, .02, delay, 'sine'); }
+  };
+  const pump = () => { while (next < ctx.currentTime + 1.5) { schedule(step, next); next += EIGHTH; step++; } };
+  const begin = () => {
+    if (!on || run || !ensure()) return;
+    ensureBus(); run = true;
+    bus.gain.cancelScheduledValues(ctx.currentTime); bus.gain.setTargetAtTime(.8, ctx.currentTime, .9);
+    next = ctx.currentTime + .15; step = 0; pump(); timer = setInterval(pump, 150);
+  };
+  const end = () => {
+    if (!run) return;
+    run = false; clearInterval(timer);
+    bus.gain.cancelScheduledValues(ctx.currentTime); bus.gain.setTargetAtTime(.0001, ctx.currentTime, .35);
+  };
+  return {
+    get on() { return on; },
+    begin,
+    toggle() { on = !on; if (on) begin(); else end(); return on; },
+    pause() { if (ctx && ctx.state === 'running') ctx.suspend(); },
+    resume() { if (ctx && on && run) ensure(); }
+  };
+})();
+function setupMusic() {
+  const b = $('music');
+  const label = () => { b.textContent = Music.on ? '🎵 Music on' : '🎵 Music off'; b.setAttribute('aria-pressed', String(Music.on)); };
+  b.addEventListener('click', () => { Music.toggle(); label(); });
+  // Browsers only allow sound after a tap or click, so the music starts on the first one.
+  document.addEventListener('pointerdown', () => Music.begin());
+  document.addEventListener('visibilitychange', () => { if (document.hidden) Music.pause(); else Music.resume(); });
+  label();
+}
+
+buildBotanicals(); setupMusic();
 updateProgress(); tick(); validate();
 </script>
 </body>
